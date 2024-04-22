@@ -34,3 +34,20 @@ def ads_general(request):
     }
 
     return render(request, 'study_app/ads.html', context=data)
+
+
+def test(request):
+    return render(request, 'study_app/test.html')
+
+
+def personal(request):
+    return render(request, 'study_app/personal.html')
+
+
+def sign_up(request):
+    return render(request, 'study_app/sign_up.html')
+
+
+def login(request):
+    return render(request, 'study_app/login.html')
+
