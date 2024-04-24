@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Авторизация</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <!-- Навигация -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">Онлайн Курсы</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/login">Вход</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/register">Регистрация</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Форма авторизации -->
+    <div class="container mt-5">
+        <h2>Авторизация</h2>
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form.errors }}
+            <div class="form-group">
+                <label for="username">Электронная почта</label>
+                <input class="form-control" id="username" placeholder="Введите ваш email" name="username">
+            </div>
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <input type="password" class="form-control" id="password" placeholder="Введите пароль" name="password">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Войти</button>
+        </form>
+
+        <p class="mt-3">Забыли пароль? <a href="/forgot-password">Восстановить</a></p>
+    </div>
+
+    <!-- Подвал -->
+    <footer class="footer bg-light text-center mt-5">
+        <div class="container">
+            <span class="text-muted">© 2024 Онлайн Курсы. Все права защищены.</span>
+        </div>
+    </footer>
+
+    <!-- Сценарии Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
