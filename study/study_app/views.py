@@ -1,11 +1,12 @@
 from django.contrib.auth.decorators import login_required
 from django import forms
+from django.forms import ModelForm
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy, reverse
-from django.views.generic import FormView
+from django.views.generic import FormView, CreateView
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import logout, login, authenticate
+from django.contrib.auth import logout, login, authenticate, get_user_model
 
 from django.contrib.auth.models import User
 
@@ -15,12 +16,7 @@ menu = ["О сайте", "Добавить статью", "Обратная св
 
 def index(request):
 
-    data = {
-        'title': 'Главная страница',
-        'menu': menu,
-    }
-
-    return render(request, 'index.html', context=data)
+    return render(request, 'index.html')
 
 
 def ads(request, ad_id):
@@ -28,24 +24,10 @@ def ads(request, ad_id):
 
 
 def ads_general(request):
-
-    data_db = [
-        {'id': 1, 'title': 'Математика', 'content': 'бим бим бам бам', 'is_published': True},
-        {'id': 2, 'title': 'Физика', 'content': 'мы стреляем', 'is_published': True},
-        {'id': 3, 'title': 'Химия', 'content': 'по кому?', 'is_published': True},
-    ]
-
-    data = {
-        'title': 'Главная страница',
-        'menu': menu,
-        'posts': data_db,
-    }
-
-    return render(request, 'ads.html', context=data)
+    return render(request, 'ads.html')
 
 
 def login_user(request):
-
     if request.user.is_authenticated:
         return redirect('/')
 
@@ -69,8 +51,19 @@ def personal(request):
     return render(request, 'lk.html')
 
 
-def register(request):
-    if request.method == 'POST':
-        form = request.POST
-        print(form)
-    return render(request, 'register.html')
+class RegisterUserForm(UserCreationForm):
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2']
+
+
+class RegisterView(FormView):
+    # model = User
+    form_class = RegisterUserForm
+    template_name = 'registration/register.html'
+    success_url = reverse_lazy('login')
+
+    def form_valid(self, form):
+        user = form.save()
+        login(self.request, user)
+        return super().form_valid(form)
