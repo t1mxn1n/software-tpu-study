@@ -1,12 +1,10 @@
 from django.contrib.auth.decorators import login_required
-from django import forms
-from django.forms import ModelForm
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy, reverse
-from django.views.generic import FormView, CreateView
+from django.views.generic import FormView
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import logout, login, authenticate, get_user_model
+from django.contrib.auth import logout, login, authenticate
 
 from django.contrib.auth.models import User
 
@@ -54,16 +52,17 @@ def personal(request):
 class RegisterUserForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = User
-        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2']
+        fields = ['first_name', 'last_name', 'email', 'password1', 'password2']
 
 
 class RegisterView(FormView):
-    # model = User
     form_class = RegisterUserForm
     template_name = 'registration/register.html'
     success_url = reverse_lazy('login')
 
     def form_valid(self, form):
-        user = form.save()
+        user = form.save(commit=False)
+        user.username = user.email
+        user.save()
         login(self.request, user)
         return super().form_valid(form)
