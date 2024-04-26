@@ -4,9 +4,13 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import FormView
 from django.contrib.auth.forms import UserCreationForm
+from django.forms.models import model_to_dict
+from django import forms
 from django.contrib.auth import logout, login, authenticate
 
 from django.contrib.auth.models import User
+
+from study_app.models import Category, Course
 
 # Create your views here.
 menu = ["О сайте", "Добавить статью", "Обратная связь", "Войти"]
@@ -46,7 +50,30 @@ def logout_user(request):
 
 @login_required
 def personal(request):
-    return render(request, 'lk.html')
+
+    if request.method == 'POST':
+        form = request.POST
+        ad = Course.objects.create(
+            teacher_id=User(id=request.user.id),
+            category_id=Category(id=form.get('cat_sel')),
+            name=form.get('name'),
+            description=form.get('description'),
+            duration=form.get('duration'),
+            price=int(form.get('price'))
+        )
+        if ad:
+            print(1)
+        else:
+            print(0)
+
+    data = {
+        'category': Category.objects.all().values(),
+        'courses': Course.objects.all().values(
+            'name', 'description', 'price', 'duration', 'category_id__name'
+        )
+    }
+    print(data)
+    return render(request, 'lk.html', context=data)
 
 
 class RegisterUserForm(UserCreationForm):

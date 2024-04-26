@@ -127,3 +127,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = reverse_lazy("personal")
 LOGIN_URL = 'login'
+
+LANGUAGE_CODE = 'ru-RU'

@@ -18,24 +18,46 @@
                     <a class="nav-link" href="#">Личный кабинет</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Мои заявки</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Размещенные объявления</a>
-                </li>
-
-                <li class="nav-item">
                     <a class="nav-link" href="/logout" >Выйти</a>
                 </li>
-
             </ul>
         </div>
     </nav>
 
     <!-- Контент -->
     <div class="container mt-5">
+        <h2>Профиль: {{ user.first_name }} {{ user.last_name }}</h2>
+        <h3>Email: {{ user.email }}</h3>
+    </div>
+    <hr>
+    <div class="container mt-5">
         <h2>Мои заявки</h2>
         <p>Список ваших текущих заявок на курсы по обучению.</p>
+        <hr>
+        <!-- Здесь можно добавить содержимое для вкладки "Мои заявки" -->
+    </div>
+
+    <div class="container mt-5">
+        <h2>Размещенные объявления</h2>
+        <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#adModel">
+            Создать объявление
+        </button>
+        <br><br>
+
+        {% for ad in courses %}
+            <div>
+                <h3>{{ ad.name }}</h3>
+                <h6><b>Категория: </b>{{ ad.category_id__name }}</h6>
+                <h6><b>Описание:</b> {{ ad.description }}</h6>
+                <h6><b>Продолжительность:</b> {{ ad.duration }}</h6>
+                <h6><b>Цена:</b> {{ ad.price }}</h6>
+                <button type="button" class="btn btn-danger" style="margin-right: 0; margin-left: auto;">Danger</button>
+            </div>
+
+            <hr>
+        {% endfor %}
+
+<!--        <p>Список ваших объявлений</p>-->
         <!-- Здесь можно добавить содержимое для вкладки "Мои заявки" -->
     </div>
 
@@ -46,8 +68,59 @@
         </div>
     </footer>
 
+    <!-- Модальное окно для формы записи -->
+    <div class="modal fade" id="adModel" tabindex="-1" aria-labelledby="adModelLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="adModelLabel">Записаться на курс</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" id="courseForm">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="name_course">Название курса</label>
+                            <input type="text" class="form-control" id="name_course" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cat_sel">Категория</label>
+
+                            <select name="cat_sel" id="cat_sel">
+                                {% for c in category %}
+                                    <option value={{c.id}}>{{c.name}}</option>
+                                {% endfor %}
+                            </select>
+
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Описание</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="duration">Длительность</label>
+                            <input type="text" class="form-control" id="duration" name="duration" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="price">Цена</label>
+                            <input type="number" class="form-control" id="price" name="price" required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Отправить заявку</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Сценарии Bootstrap -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 </body>
 </html>
