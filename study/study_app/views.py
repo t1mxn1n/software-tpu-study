@@ -53,26 +53,27 @@ def personal(request):
 
     if request.method == 'POST':
         form = request.POST
-        ad = Course.objects.create(
-            teacher_id=User(id=request.user.id),
-            category_id=Category(id=form.get('cat_sel')),
-            name=form.get('name'),
-            description=form.get('description'),
-            duration=form.get('duration'),
-            price=int(form.get('price'))
-        )
-        if ad:
-            print(1)
-        else:
-            print(0)
+        if len(form) == 6:
+            Course.objects.create(
+                teacher_id=User(id=request.user.id),
+                category_id=Category(id=form.get('cat_sel')),
+                name=form.get('name'),
+                description=form.get('description'),
+                duration=form.get('duration'),
+                price=int(form.get('price'))
+            )
+        elif len(form) == 3:
+
+            if int(form.get('teacher_id')) == request.user.id:
+                course = Course.objects.filter(id=form.get('id_course'))
+                course.delete()
 
     data = {
         'category': Category.objects.all().values(),
-        'courses': Course.objects.all().values(
-            'name', 'description', 'price', 'duration', 'category_id__name'
+        'courses': Course.objects.filter(teacher_id=request.user.id).values(
+            'name', 'description', 'price', 'duration', 'category_id__name', 'teacher_id_id', 'id'
         )
     }
-    print(data)
     return render(request, 'lk.html', context=data)
 
 
