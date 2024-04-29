@@ -41,39 +41,35 @@
     <!-- Курсы -->
     <div class="container mt-5">
         <h2>Преподаваемые курсы</h2>
+
+        {% if error %}
+            <h4 style="color: red">{{ error_msg }}</h4>
+        {% endif %}
+
+        {% if success %}
+            <h4 style="color: green">{{ msg }}</h4>
+        {% endif %}
+
         <div>
             <!-- Пример курса -->
+            {% for c in courses %}
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Название курса</h5>
-                    <p class="card-text">Краткое описание курса.</p>
+                    <h5 class="card-title">{{ c.name }}</h5>
+                    <p class="card-text">{{ c.description }}</p>
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Категория: Web-разработка</li>
-                        <li class="list-group-item">Цена: $50</li>
-                        <li class="list-group-item">Срок обучения: 3 месяца</li>
+                        <li class="list-group-item">Категория: {{ c.category_id__name }}</li>
+                        <li class="list-group-item">Цена: {{ c.price }}</li>
+                        <li class="list-group-item">Срок обучения: {{ c.duration }}</li>
                     </ul>
-                    <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#registrationModal">
+                    <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#registrationModal" onclick="send_course_info({{ c.id }}, {{ c.teacher_id_id }})">
                         Записаться
                     </button>
                 </div>
             </div>
             <br>
-            <!-- Добавьте больше курсов здесь -->
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Название курса</h5>
-                    <p class="card-text">Краткое описание курса.</p>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Категория: Web-разработка</li>
-                        <li class="list-group-item">Цена: $50</li>
-                        <li class="list-group-item">Срок обучения: 3 месяца</li>
-                    </ul>
-                    <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#registrationModal">
-                        Записаться
-                    </button>
-                </div>
-                <br>
-            </div>
+            {% endfor %}
+
         </div>
     </div>
 
@@ -88,38 +84,33 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="courseForm" onsubmit="submitForm(event)">
+                    <form id="courseForm" method="post">
+                        {% csrf_token %}
                         <div class="form-group">
                             <label for="date">Дата занятия</label>
-                            <input type="date" class="form-control" id="date" required>
+                            <input type="date" class="form-control" id="date" name="date" required>
                         </div>
                         <div class="form-group">
                             <label for="time">Время занятия</label>
-                            <input type="time" class="form-control" id="time" required>
+                            <input type="time" class="form-control" id="time" name="time" required>
                         </div>
                         <div class="form-group">
                             <label for="comment">Комментарий к заявке</label>
-                            <textarea class="form-control" id="comment" rows="3"></textarea>
+                            <textarea class="form-control" id="comment" name="comment" rows="3"></textarea>
                         </div>
+
+                        <div class="form-group" style="display:none;">
+                            <label for="id_course"></label>
+                            <textarea class="form-control" id="id_course" name="id_course" rows="3"></textarea>
+                        </div>
+
+                        <div class="form-group" style="display:none;">
+                            <label for="teacher_id"></label>
+                            <textarea class="form-control" id="teacher_id" name="teacher_id" rows="3"></textarea>
+                        </div>
+
                         <button type="submit" class="btn btn-primary">Отправить заявку</button>
                     </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast уведомление -->
-    <div aria-live="polite" aria-atomic="true" style="position: relative;">
-        <div style="position: absolute; top: 20px; right: 20px;">
-            <div class="toast" id="successToast" data-delay="3000">
-                <div class="toast-header">
-                    <strong class="mr-auto">Уведомление</strong>
-                    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Cose">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="toast-body" style="background: #d9d9d9">
-                    Заявка успешно отправлена!
                 </div>
             </div>
         </div>
@@ -131,11 +122,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
     <script>
-    function submitForm(event) {
-        event.preventDefault(); // предотвратить перезагрузку страницы
-        $('#registrationModal').modal('hide'); // закрыть модальное окно
-        $('#successToast').toast('show'); // показать всплывающее уведомление
-    }
+        function send_course_info(course_id, teacher_id) {
+            let id_elem = document.getElementById("id_course");
+            let teacher_id_elem = document.getElementById("teacher_id");
+            id_elem.value = course_id;
+            teacher_id_elem.value = teacher_id;
+        }
     </script>
+
 </body>
 </html>

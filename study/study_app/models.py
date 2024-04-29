@@ -22,6 +22,7 @@ class Lesson(models.Model):
     student_id = models.ForeignKey(User, on_delete=models.PROTECT)
     time_start = models.DateTimeField()
     time_end = models.DateTimeField()
+    comment = models.CharField(max_length=255, default='Отсутствует')
 
 
 class Feedback(models.Model):
