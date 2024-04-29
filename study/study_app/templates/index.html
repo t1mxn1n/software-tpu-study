@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Онлайн Курсы</title>
+    {% load static %}
+    <link rel="icon" href="study_app/favicon.png" type="image/png">
+    <link rel="shortcut icon" href="https://icons8.com/icon/16369/book" type="image/png">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
@@ -40,34 +43,38 @@
     <!-- О компании -->
     <div class="container mt-5" id="about">
         <h2>О нашей компании</h2>
-        <p>Мы предлагаем широкий спектр онлайн курсов, которые помогут вам приобрести новые навыки и знания. Наши инструкторы - опытные профессионалы в своих областях, которые готовы поделиться своим опытом с вами.</p>
+        <h5>Мы предлагаем широкий спектр онлайн курсов, которые помогут вам приобрести новые навыки и знания. Вы можете выбрать интересующие вас курсы, а также предложить свои курсы по обучению.</h5>
     </div>
 
     <!-- Список курсов -->
     <div class="container mt-5" id="courses">
         <h2>Наши курсы</h2>
+
         <div class="row">
+
             <div class="col-md-4">
                 <div class="card mb-4">
-                    <img class="card-img-top" src="https://via.placeholder.com/150" alt="Курс 1">
+                    <img class="card-img-top" src="https://i.pinimg.com/564x/90/44/a6/9044a634e09b2a633ff73efad0fdf470.jpg" alt="Курс 1">
                     <div class="card-body">
                         <h5 class="card-title">Основы программирования</h5>
                         <p class="card-text">Научитесь основам программирования и создавайте свои первые приложения.</p>
                     </div>
                 </div>
             </div>
+
             <div class="col-md-4">
                 <div class="card mb-4">
-                    <img class="card-img-top" src="https://via.placeholder.com/150" alt="Курс 2">
+                    <img class="card-img-top" src="https://gagaru.club/uploads/posts/2023-02/1675867291_gagaru-club-p-geometricheskie-krasivie-uzori-instagram-2.jpg" alt="Курс 2">
                     <div class="card-body">
                         <h5 class="card-title">Графический дизайн</h5>
                         <p class="card-text">Изучите основы графического дизайна и научитесь создавать привлекательные визуальные элементы.</p>
                     </div>
                 </div>
             </div>
+
             <div class="col-md-4">
                 <div class="card mb-4">
-                    <img class="card-img-top" src="https://via.placeholder.com/150" alt="Курс 3">
+                    <img class="card-img-top" src="https://i.pinimg.com/736x/db/9e/4d/db9e4d3e8bbf79b4ce93ada1fd0df081.jpg" width="200" height="340" alt="Курс 3">
                     <div class="card-body">
                         <h5 class="card-title">Цифровой маркетинг</h5>
                         <p class="card-text">Узнайте, как эффективно продвигать свои продукты или услуги в интернете.</p>
@@ -75,6 +82,9 @@
                 </div>
             </div>
         </div>
+
+        <a href="/ads"><h4>Ознакомиться с курсами</h4></a>
+
     </div>
 
     <!-- Контактная информация -->

@@ -32,6 +32,11 @@ def ads_general(request):
     if request.method == "POST":
         form = request.POST
 
+        if not request.user.id:
+            return render(request, 'ads.html', context={'courses': ads,
+                                                        'error': True,
+                                                        'error_msg': f'Необходима авторизация для отрпавки заявки!'})
+
         if request.user.id and request.user.id == int(form.get("teacher_id")):
             return render(request, 'ads.html', context={'courses': ads,
                                                         'error': True,
