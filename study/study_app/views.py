@@ -91,7 +91,7 @@ def personal(request):
 
     if request.method == 'POST':
         form = request.POST
-        if len(form) == 6:
+        if "create_course" in form:
             Course.objects.create(
                 teacher_id=User(id=request.user.id),
                 category_id=Category(id=form.get('cat_sel')),
@@ -100,19 +100,52 @@ def personal(request):
                 duration=form.get('duration'),
                 price=int(form.get('price'))
             )
-        elif len(form) == 3:
-
+        elif "del_course" in form:
             if int(form.get('teacher_id')) == request.user.id:
                 course = Course.objects.filter(id=form.get('id_course'))
                 course.delete()
+        elif "del_lesson" in form:
+            if int(form.get('student_id')) == request.user.id:
+                lesson = Lesson.objects.filter(id=form.get('lesson_id'))
+                lesson.delete()
+        elif "reject" in form:
+            lesson = Lesson.objects.get(pk=form.get('lesson_id'))
+            lesson.is_approved = False
+            lesson.save()
+        elif "approve" in form:
+            lesson = Lesson.objects.get(pk=form.get('lesson_id'))
+            lesson.is_approved = True
+            lesson.save()
+        elif "del_lesson_teacher" in form:
+            lesson = Lesson.objects.filter(id=form.get('lesson_id'))
+            lesson.delete()
+
+    lessons_as_student_to_html = prettify_lessons({"student_id": request.user.id})
+    lessons_as_teacher_to_html = prettify_lessons({"course_id__teacher_id": request.user.id})
 
     data = {
         'category': Category.objects.all().values(),
         'courses': Course.objects.filter(teacher_id=request.user.id).values(
             'name', 'description', 'price', 'duration', 'category_id__name', 'teacher_id_id', 'id'
-        )
+        ),
+        'lessons_as_student': lessons_as_student_to_html,
+        'lessons_as_teacher': lessons_as_teacher_to_html
     }
     return render(request, 'lk.html', context=data)
+
+
+def prettify_lessons(kwargs):
+    lessons_orm = Lesson.objects.filter(**kwargs).values(
+        'time_start', 'time_end', 'course_id__name', 'course_id__price', 'course_id__description',
+        'course_id__category_id__name', 'is_approved', 'id', 'student_id', 'student_id__last_name',
+        'student_id__first_name', 'student_id__email', 'comment'
+    )
+    lessons = []
+    for les in lessons_orm:
+        les['prettify_date'] = f'{les["time_start"].strftime("%d.%m.%Y")}'
+        les['prettify_time'] = f'{les["time_start"].strftime("%H:%M")} - {les["time_end"].strftime("%H:%M")}'
+        lessons.append(les)
+    return lessons
 
 
 class RegisterUserForm(UserCreationForm):

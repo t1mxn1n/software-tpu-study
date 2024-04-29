@@ -32,16 +32,126 @@
     <hr>
     <div class="container mt-5">
         <h2>Мои заявки</h2>
-        <p>Список ваших текущих заявок на курсы по обучению.</p>
-        <hr>
+        <h4>Список ваших заявок на курсы по обучению.</h4>
+
+        {% for r in lessons_as_student %}
+
+            <hr>
+            {% if r.is_approved %}
+                <h5 style="color: #146c43">Подтверждено</h5>
+            {% else %}
+                <h5 style="color: red">Не подтверждено</h5>
+            {% endif %}
+            <p><b>Курс: </b>{{ r.course_id__name }}, <b>Категория: </b>{{ r.course_id__category_id__name }}, <b>Цена: </b>{{ r.course_id__price }}</p>
+            <p><b>Дата проведения: </b>{{ r.prettify_date }} время: {{ r.prettify_time }}</p>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div style="display: none;" class="form-group">
+                    <label for="id_course_st"></label>
+                    <input type="text" class="form-control" id="id_course_st" name="lesson_id" value="{{ r.id }}">
+                </div>
+
+                <div style="display: none;" class="form-group">
+                    <label for="student_id_st"></label>
+                    <input type="text" class="form-control" id="student_id_st" name="student_id" value="{{ r.student_id }}">
+                </div>
+
+                <button type="submit" class="btn btn-danger" name="del_lesson">Отменить запись</button>
+            </form>
+
+        {% endfor %}
+        <br>
+        <hr style="height:3px;border:none;color:#333;background-color:#333;">
         <!-- Здесь можно добавить содержимое для вкладки "Мои заявки" -->
     </div>
 
     <div class="container mt-5">
-        <h2>Размещенные объявления</h2>
-        <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#adModel">
-            Создать объявление
-        </button>
+
+        <h4>Список заявок на ваши курсы.</h4>
+
+        {% for r in lessons_as_teacher %}
+        <hr>
+        {% if r.is_approved %}
+            <h5 style="color: #146c43">Подтверждено</h5>
+        {% else %}
+            <h5 style="color: red">Не подтверждено</h5>
+        {% endif %}
+        <p><b>Курс: </b>{{ r.course_id__name }}, <b>Цена: </b>{{ r.course_id__price }}</p>
+        <p><b>Дата проведения: </b>{{ r.prettify_date }} время: {{ r.prettify_time }}</p>
+        <p><b>Обучающийся: </b>{{ r.student_id__last_name }} {{ r.student_id__first_name }} ({{ r.student_id__email }})</p>
+        <p><b>Комментарий: </b>{{ r.comment }}</p>
+        <div>
+            {% if r.is_approved %}
+            <form method="post" style="display: inline-block">
+                {% csrf_token %}
+                <div style="display: none;" class="form-group">
+                    <label for="id_course_teach2"></label>
+                    <input type="text" class="form-control" id="id_course_teach2" name="lesson_id" value="{{ r.id }}">
+                </div>
+                <div style="display: none;" class="form-group">
+                    <label for="student_id_teach2"></label>
+                    <input type="text" class="form-control" id="student_id_teach2" name="student_id" value="{{ r.student_id }}">
+                </div>
+                <button type="submit" class="btn btn-dark" name="reject">Отклонить заявку</button>
+            </form>
+
+            {% else %}
+
+            <form method="post" style="display: inline-block">
+                {% csrf_token %}
+                <div style="display: none;" class="form-group">
+                    <label for="id_course_teach"></label>
+                    <input type="text" class="form-control" id="id_course_teach" name="lesson_id" value="{{ r.id }}">
+                </div>
+                <div style="display: none;" class="form-group">
+                    <label for="student_id_teach"></label>
+                    <input type="text" class="form-control" id="student_id_teach" name="student_id" value="{{ r.student_id }}">
+                </div>
+                <button type="submit" class="btn btn-success" name="approve">Принять заявку</button>
+            </form>
+
+            {% endif %}
+
+            <form method="post" style="display: inline-block">
+                {% csrf_token %}
+
+                <div style="display: none;" class="form-group">
+                    <label for="id_course_teach1"></label>
+                    <input type="text" class="form-control" id="id_course_teach1" name="lesson_id" value="{{ r.id }}">
+                </div>
+
+                <div style="display: none;" class="form-group">
+                    <label for="student_id_teach1"></label>
+                    <input type="text" class="form-control" id="student_id_teach1" name="student_id" value="{{ r.student_id }}">
+                </div>
+
+                <button type="submit" class="btn btn-danger" name="del_lesson_teacher">Удалить заявку</button>
+
+            </form>
+        </div>
+
+        {% endfor %}
+
+        <br>
+        <hr style="height:3px;border:none;color:#333;background-color:#333;">
+    </div>
+
+
+
+    <div class="container mt-5">
+        <div style="display: inline-flex;">
+
+            <h2>Размещенные объявления</h2>
+
+            <button style="margin-left: 20px" type="button" class="btn btn-primary" data-target="#adModel">
+                Создать объявление
+            </button>
+
+        </div>
+
+
         <br><br>
 
         {% for ad in courses %}
@@ -64,7 +174,7 @@
                         <input type="text" class="form-control" id="teacher_id" name="teacher_id" value="{{ ad.teacher_id_id }}">
                     </div>
 
-                    <button type="submit" class="btn btn-danger" style="margin-right: 0; margin-left: auto;">Удалить</button>
+                    <button type="submit" class="btn btn-danger" style="margin-right: 0; margin-left: auto;" name="del_course">Удалить</button>
                 </form>
             </div>
 
@@ -124,7 +234,7 @@
                             <input type="number" class="form-control" id="price" name="price" required></textarea>
                         </div>
 
-                        <button type="submit" class="btn btn-primary">Отправить заявку</button>
+                        <button type="submit" class="btn btn-primary" name="create_course">Отправить заявку</button>
                     </form>
                 </div>
             </div>
