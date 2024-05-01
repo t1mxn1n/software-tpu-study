@@ -23,9 +23,15 @@ class Lesson(models.Model):
     time_start = models.DateTimeField()
     time_end = models.DateTimeField()
     comment = models.CharField(max_length=255, default='Отсутствует')
+    state_id = models.ForeignKey('LessonState', on_delete=models.CASCADE, default=1)
+    feedback_done = models.BooleanField(default=False)
+
+
+class LessonState(models.Model):
+    name = models.CharField(max_length=255)
 
 
 class Feedback(models.Model):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    lesson_id = models.ForeignKey('Lesson', on_delete=models.CASCADE)
     rating = models.IntegerField()
-    description = models.CharField(max_length=255)
+    description = models.CharField(max_length=255, default='Отсутствует')

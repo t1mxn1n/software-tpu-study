@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Преподаваемые курсы</title>
     {% load static %}
-    <link rel="icon" href="study_app/favicon.png" type="image/png">
+    <link rel="icon" href="/static/study_app/favicon.png" type="image/png">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 </head>
@@ -64,7 +64,7 @@
                         <li class="list-group-item">Цена: {{ c.price }}</li>
                         <li class="list-group-item">Срок обучения: {{ c.duration }}</li>
                     </ul>
-                    <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#registrationModal" onclick="send_course_info({{ c.id }}, {{ c.teacher_id_id }})">
+                    <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#registrationModal" onclick="send_course_info({{ c.id }}, {{ c.teacher_id_id }}, {{ c.feedbacks }})">
                         Записаться
                     </button>
                 </div>
@@ -112,25 +112,47 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary">Отправить заявку</button>
+
+                        <div id="feedbacks_div_id" style="display: none">
+                        </div>
+
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
+    <script>
+        function send_course_info(course_id, teacher_id, fb) {
+            let id_elem = document.getElementById("id_course");
+            let teacher_id_elem = document.getElementById("teacher_id");
+            let fb_div_elem = document.getElementById("feedbacks_div_id");
+            fb_div_elem.innerHTML = "";
+            fb_div_elem.style = "display: none;";
+            if (fb.length > 0) {
+                fb_div_elem.innerHTML = "<hr><h4>Отзывы о занятии</h4>";
+                for (let i = 0; i < fb.length; i++) {
+                    fb_div_elem.innerHTML += `<h6><b>Ученик: </b>${fb[i]['lesson_id__student_id__first_name']}</h6>`;
+                    fb_div_elem.innerHTML += `<h6><b>Оценка: </b>${fb[i]['rating']}/5</h6>`;
+                    fb_div_elem.innerHTML += `<h6><b>Отзыв: </b>${fb[i]['description']}</h6>`;
+                    if (i !== fb.length - 1) {
+                        fb_div_elem.innerHTML += `<hr>`;
+                    }
+                }
+                fb_div_elem.style = "display: block;";
+            }
+            id_elem.value = course_id;
+            teacher_id_elem.value = teacher_id;
+
+        }
+    </script>
+
     <!-- Сценарии -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
-    <script>
-        function send_course_info(course_id, teacher_id) {
-            let id_elem = document.getElementById("id_course");
-            let teacher_id_elem = document.getElementById("teacher_id");
-            id_elem.value = course_id;
-            teacher_id_elem.value = teacher_id;
-        }
-    </script>
+
 
 </body>
 </html>

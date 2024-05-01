@@ -12,7 +12,7 @@ from django.contrib.auth import logout, login, authenticate
 
 from django.contrib.auth.models import User
 
-from study_app.models import Category, Course, Lesson
+from study_app.models import Category, Course, Lesson, LessonState, Feedback
 
 # Create your views here.
 menu = ["О сайте", "Добавить статью", "Обратная связь", "Войти"]
@@ -46,7 +46,8 @@ def ads_general(request):
 
             check_lesson_exist = Lesson.objects.filter(
                 student_id=request.user.id,
-                course_id=form.get("id_course")
+                course_id=form.get("id_course"),
+                state_id=1
             )
 
             if check_lesson_exist:
@@ -69,7 +70,24 @@ def ads_general(request):
                                                         'success': True,
                                                         'msg': f'Заявка на занятие по "{Course.objects.get(pk=form.get("id_course")).name}" успешно создана!'})
 
+    ads = get_feedbacks(ads)
+
     return render(request, 'ads.html', context={'courses': ads})
+
+
+def get_feedbacks(courses):
+    feedbacks = Feedback.objects.all().values('lesson_id', 'rating', 'description', 'lesson_id__course_id', 'lesson_id__student_id__first_name', 'id')
+    new_courses = []
+    for course in courses:
+        new_course = course
+        new_course['feedbacks'] = []
+        new_course['feedback_flag'] = False
+        for fb in feedbacks:
+            if fb['lesson_id__course_id'] == course['id']:
+                new_course['feedbacks'].append(fb)
+                new_course['feedback_flag'] = True
+        new_courses.append(new_course)
+    return new_courses
 
 
 def login_user(request):
@@ -111,8 +129,9 @@ def personal(request):
                 course.delete()
         elif "del_lesson" in form:
             if int(form.get('student_id')) == request.user.id:
-                lesson = Lesson.objects.filter(id=form.get('lesson_id'))
-                lesson.delete()
+                lesson = Lesson.objects.get(pk=form.get('lesson_id'))
+                lesson.state_id = LessonState(id=3)
+                lesson.save()
         elif "reject" in form:
             lesson = Lesson.objects.get(pk=form.get('lesson_id'))
             lesson.is_approved = False
@@ -122,11 +141,25 @@ def personal(request):
             lesson.is_approved = True
             lesson.save()
         elif "del_lesson_teacher" in form:
-            lesson = Lesson.objects.filter(id=form.get('lesson_id'))
-            lesson.delete()
+            lesson = Lesson.objects.get(pk=form.get('lesson_id'))
+            lesson.state_id = LessonState(id=3)
+            lesson.save()
+        elif "feedback" in form:
+            lesson = Lesson.objects.get(pk=form.get('lesson_id'))
+            feedback = Feedback.objects.create(
+                lesson_id=Lesson(id=form.get('lesson_id')),
+                rating=form.get('rate'),
+                description=form.get('description')
+            )
+            if feedback:
+                lesson.feedback_done = True
+                lesson.save()
 
-    lessons_as_student_to_html = prettify_lessons({"student_id": request.user.id})
-    lessons_as_teacher_to_html = prettify_lessons({"course_id__teacher_id": request.user.id})
+    check_expires_lessons()
+
+    lessons_as_student_to_html = prettify_lessons({"student_id": request.user.id, "state_id": 1})
+    lessons_as_teacher_to_html = prettify_lessons({"course_id__teacher_id": request.user.id, "state_id": 1})
+    expires_lessons_to_html_for_student = prettify_lessons({"student_id": request.user.id, "state_id": 2})
 
     data = {
         'category': Category.objects.all().values(),
@@ -134,16 +167,26 @@ def personal(request):
             'name', 'description', 'price', 'duration', 'category_id__name', 'teacher_id_id', 'id'
         ),
         'lessons_as_student': lessons_as_student_to_html,
-        'lessons_as_teacher': lessons_as_teacher_to_html
+        'lessons_as_teacher': lessons_as_teacher_to_html,
+        'expires_lessons_to_html_for_student': expires_lessons_to_html_for_student
     }
     return render(request, 'lk.html', context=data)
+
+
+def check_expires_lessons():
+    lessons = Lesson.objects.all().values()
+    for lesson in lessons:
+        if datetime.datetime.now() > lesson['time_end'] and lesson['is_approved']:
+            lesson_change = Lesson.objects.get(pk=lesson['id'])
+            lesson_change.state_id = LessonState(id=2)
+            lesson_change.save()
 
 
 def prettify_lessons(kwargs):
     lessons_orm = Lesson.objects.filter(**kwargs).values(
         'time_start', 'time_end', 'course_id__name', 'course_id__price', 'course_id__description',
         'course_id__category_id__name', 'is_approved', 'id', 'student_id', 'student_id__last_name',
-        'student_id__first_name', 'student_id__email', 'comment'
+        'student_id__first_name', 'student_id__email', 'comment', 'feedback_done'
     )
     lessons = []
     for les in lessons_orm:

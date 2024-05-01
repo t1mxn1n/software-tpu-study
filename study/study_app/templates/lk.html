@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Личный кабинет</title>
     {% load static %}
-    <link rel="icon" href="study_app/favicon.png" type="image/png">
+    <link rel="icon" href="/static/study_app/favicon.png" type="image/png">
     <link rel="shortcut icon" href="images/favicon.png" type="image/png">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
@@ -37,35 +37,39 @@
         <h2>Мои заявки</h2>
         <h4>Список ваших заявок на курсы по обучению.</h4>
 
-        {% for r in lessons_as_student %}
+        {% if lessons_as_student %}
+            {% for r in lessons_as_student %}
 
-            <hr>
-            {% if r.is_approved %}
-                <h5 style="color: #146c43">Подтверждено</h5>
-            {% else %}
-                <h5 style="color: red">Не подтверждено</h5>
-            {% endif %}
-            <p><b>Курс: </b>{{ r.course_id__name }}, <b>Категория: </b>{{ r.course_id__category_id__name }}, <b>Цена: </b>{{ r.course_id__price }}</p>
-            <p><b>Дата проведения: </b>{{ r.prettify_date }} время: {{ r.prettify_time }}</p>
+                <hr>
+                {% if r.is_approved %}
+                    <h5 style="color: #146c43">Подтверждено</h5>
+                {% else %}
+                    <h5 style="color: red">Не подтверждено</h5>
+                {% endif %}
+                <p><b>Курс: </b>{{ r.course_id__name }}, <b>Категория: </b>{{ r.course_id__category_id__name }}, <b>Цена: </b>{{ r.course_id__price }}</p>
+                <p><b>Дата проведения: </b>{{ r.prettify_date }} время: {{ r.prettify_time }}</p>
 
-            <form method="post">
-                {% csrf_token %}
+                <form method="post">
+                    {% csrf_token %}
 
-                <div style="display: none;" class="form-group">
-                    <label for="id_course_st"></label>
-                    <input type="text" class="form-control" id="id_course_st" name="lesson_id" value="{{ r.id }}">
-                </div>
+                    <div style="display: none;" class="form-group">
+                        <label for="id_course_st"></label>
+                        <input type="text" class="form-control" id="id_course_st" name="lesson_id" value="{{ r.id }}">
+                    </div>
 
-                <div style="display: none;" class="form-group">
-                    <label for="student_id_st"></label>
-                    <input type="text" class="form-control" id="student_id_st" name="student_id" value="{{ r.student_id }}">
-                </div>
+                    <div style="display: none;" class="form-group">
+                        <label for="student_id_st"></label>
+                        <input type="text" class="form-control" id="student_id_st" name="student_id" value="{{ r.student_id }}">
+                    </div>
 
-                <button type="submit" class="btn btn-danger" name="del_lesson">Отменить запись</button>
-            </form>
+                    <button type="submit" class="btn btn-danger" name="del_lesson">Отменить запись</button>
+                </form>
 
-        {% endfor %}
-        <br>
+            {% endfor %}
+        {% else %}
+            <h4 style="color: red">Нет записей</h4>
+        {% endif %}
+
         <hr style="height:3px;border:none;color:#333;background-color:#333;">
         <!-- Здесь можно добавить содержимое для вкладки "Мои заявки" -->
     </div>
@@ -73,71 +77,73 @@
     <div class="container mt-5">
 
         <h4>Список заявок на ваши курсы.</h4>
-
-        {% for r in lessons_as_teacher %}
-        <hr>
-        {% if r.is_approved %}
-            <h5 style="color: #146c43">Подтверждено</h5>
-        {% else %}
-            <h5 style="color: red">Не подтверждено</h5>
-        {% endif %}
-        <p><b>Курс: </b>{{ r.course_id__name }}, <b>Цена: </b>{{ r.course_id__price }}</p>
-        <p><b>Дата проведения: </b>{{ r.prettify_date }} время: {{ r.prettify_time }}</p>
-        <p><b>Обучающийся: </b>{{ r.student_id__last_name }} {{ r.student_id__first_name }} ({{ r.student_id__email }})</p>
-        <p><b>Комментарий: </b>{{ r.comment }}</p>
-        <div>
+        {% if lessons_as_teacher %}
+            {% for r in lessons_as_teacher %}
+            <hr>
             {% if r.is_approved %}
-            <form method="post" style="display: inline-block">
-                {% csrf_token %}
-                <div style="display: none;" class="form-group">
-                    <label for="id_course_teach2"></label>
-                    <input type="text" class="form-control" id="id_course_teach2" name="lesson_id" value="{{ r.id }}">
-                </div>
-                <div style="display: none;" class="form-group">
-                    <label for="student_id_teach2"></label>
-                    <input type="text" class="form-control" id="student_id_teach2" name="student_id" value="{{ r.student_id }}">
-                </div>
-                <button type="submit" class="btn btn-dark" name="reject">Отклонить заявку</button>
-            </form>
-
+                <h5 style="color: #146c43">Подтверждено</h5>
             {% else %}
-
-            <form method="post" style="display: inline-block">
-                {% csrf_token %}
-                <div style="display: none;" class="form-group">
-                    <label for="id_course_teach"></label>
-                    <input type="text" class="form-control" id="id_course_teach" name="lesson_id" value="{{ r.id }}">
-                </div>
-                <div style="display: none;" class="form-group">
-                    <label for="student_id_teach"></label>
-                    <input type="text" class="form-control" id="student_id_teach" name="student_id" value="{{ r.student_id }}">
-                </div>
-                <button type="submit" class="btn btn-success" name="approve">Принять заявку</button>
-            </form>
-
+                <h5 style="color: red">Не подтверждено</h5>
             {% endif %}
+            <p><b>Курс: </b>{{ r.course_id__name }}, <b>Цена: </b>{{ r.course_id__price }}</p>
+            <p><b>Дата проведения: </b>{{ r.prettify_date }} время: {{ r.prettify_time }}</p>
+            <p><b>Обучающийся: </b>{{ r.student_id__last_name }} {{ r.student_id__first_name }} ({{ r.student_id__email }})</p>
+            <p><b>Комментарий: </b>{{ r.comment }}</p>
+            <div>
+                {% if r.is_approved %}
+                <form method="post" style="display: inline-block">
+                    {% csrf_token %}
+                    <div style="display: none;" class="form-group">
+                        <label for="id_course_teach2"></label>
+                        <input type="text" class="form-control" id="id_course_teach2" name="lesson_id" value="{{ r.id }}">
+                    </div>
+                    <div style="display: none;" class="form-group">
+                        <label for="student_id_teach2"></label>
+                        <input type="text" class="form-control" id="student_id_teach2" name="student_id" value="{{ r.student_id }}">
+                    </div>
+                    <button type="submit" class="btn btn-dark" name="reject">Отклонить заявку</button>
+                </form>
 
-            <form method="post" style="display: inline-block">
-                {% csrf_token %}
+                {% else %}
 
-                <div style="display: none;" class="form-group">
-                    <label for="id_course_teach1"></label>
-                    <input type="text" class="form-control" id="id_course_teach1" name="lesson_id" value="{{ r.id }}">
-                </div>
+                <form method="post" style="display: inline-block">
+                    {% csrf_token %}
+                    <div style="display: none;" class="form-group">
+                        <label for="id_course_teach"></label>
+                        <input type="text" class="form-control" id="id_course_teach" name="lesson_id" value="{{ r.id }}">
+                    </div>
+                    <div style="display: none;" class="form-group">
+                        <label for="student_id_teach"></label>
+                        <input type="text" class="form-control" id="student_id_teach" name="student_id" value="{{ r.student_id }}">
+                    </div>
+                    <button type="submit" class="btn btn-success" name="approve">Принять заявку</button>
+                </form>
 
-                <div style="display: none;" class="form-group">
-                    <label for="student_id_teach1"></label>
-                    <input type="text" class="form-control" id="student_id_teach1" name="student_id" value="{{ r.student_id }}">
-                </div>
+                {% endif %}
 
-                <button type="submit" class="btn btn-danger" name="del_lesson_teacher">Удалить заявку</button>
+                <form method="post" style="display: inline-block">
+                    {% csrf_token %}
 
-            </form>
-        </div>
+                    <div style="display: none;" class="form-group">
+                        <label for="id_course_teach1"></label>
+                        <input type="text" class="form-control" id="id_course_teach1" name="lesson_id" value="{{ r.id }}">
+                    </div>
 
-        {% endfor %}
+                    <div style="display: none;" class="form-group">
+                        <label for="student_id_teach1"></label>
+                        <input type="text" class="form-control" id="student_id_teach1" name="student_id" value="{{ r.student_id }}">
+                    </div>
 
-        <br>
+                    <button type="submit" class="btn btn-danger" name="del_lesson_teacher">Удалить заявку</button>
+
+                </form>
+            </div>
+
+            {% endfor %}
+        {% else %}
+            <h4 style="color: red">Нет записей</h4>
+        {% endif %}
+
         <hr style="height:3px;border:none;color:#333;background-color:#333;">
     </div>
 
@@ -159,6 +165,7 @@
 
         {% for ad in courses %}
             <div>
+                <hr>
                 <h3>{{ ad.name }}</h3>
                 <h6><b>Категория: </b>{{ ad.category_id__name }}</h6>
                 <h6><b>Описание:</b> {{ ad.description }}</h6>
@@ -181,12 +188,46 @@
                 </form>
             </div>
 
-            <hr>
+
         {% endfor %}
 
-<!--        <p>Список ваших объявлений</p>-->
+        <br>
+        <hr style="height:3px;border:none;color:#333;background-color:#333;">
+    </div>
+
+
+    <div class="container mt-5">
+        <h2>Прошедшие занятия</h2>
+
+        {% for r in expires_lessons_to_html_for_student %}
+        <hr>
+            <p><b>Курс: </b>{{ r.course_id__name }}, <b>Категория: </b>{{ r.course_id__category_id__name }}, <b>Цена: </b>{{ r.course_id__price }}</p>
+            <p><b>Дата проведения: </b>{{ r.prettify_date }} время: {{ r.prettify_time }}</p>
+
+            <div style="display: none;" class="form-group">
+                <label for="id_course_st4"></label>
+                <input type="text" class="form-control" id="id_course_st4" name="lesson_id" value="{{ r.id }}">
+            </div>
+
+            <div style="display: none;" class="form-group">
+                <label for="student_id_st5"></label>
+                <input type="text" class="form-control" id="student_id_st5" name="student_id" value="{{ r.student_id }}">
+            </div>
+
+            {% if not r.feedback_done %}
+
+                <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#feedback" onclick="send_lesson_info({{ r.id }}, {{ r.student_id }})">
+                    Оставить отзыв
+                </button>
+            {% endif %}
+
+
+        {% endfor %}
+        <br>
+        <hr style="height:3px;border:none;color:#333;background-color:#333;">
         <!-- Здесь можно добавить содержимое для вкладки "Мои заявки" -->
     </div>
+
 
     <!-- Подвал -->
     <footer class="footer bg-light text-center mt-5">
@@ -194,6 +235,46 @@
             <span class="text-muted">© 2024 Онлайн Курсы. Все права защищены.</span>
         </div>
     </footer>
+
+    <div class="modal fade" id="feedback" tabindex="-1" aria-labelledby="feedbackLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="feedbackLabel">Оставить отзыв</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="feedback_form" method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="date">Оценка</label>
+                            <input type="number" min="1" max="5" class="form-control" id="date" name="rate" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description123">Отзыв</label>
+                            <textarea class="form-control" id="description123" name="description" rows="3"></textarea>
+                        </div>
+
+                        <div class="form-group" style="display:none;">
+                            <label for="lesson_id"></label>
+                            <textarea class="form-control" id="lesson_id" name="lesson_id" rows="3"></textarea>
+                        </div>
+
+                        <div class="form-group" style="display:none;">
+                            <label for="student_id"></label>
+                            <textarea class="form-control" id="student_id" name="student_id" rows="3"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" name="feedback">Отправить</button>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Модальное окно для формы записи -->
     <div class="modal fade" id="adModel" tabindex="-1" aria-labelledby="adModelLabel" aria-hidden="true">
@@ -243,6 +324,15 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function send_lesson_info(lesson_id, student_id) {
+            let id_elem = document.getElementById("lesson_id");
+            let student_id_elem = document.getElementById("student_id");
+            id_elem.value = lesson_id;
+            student_id_elem.value = student_id;
+        }
+    </script>
 
     <!-- Сценарии Bootstrap -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
