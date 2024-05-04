@@ -18,6 +18,8 @@
 
 Активируйте переменную окружения: `.\venv\Scripts\activate`
 
+Установите необходимые зависимости: `pip install -r requirements.txt`
+
 Выполните миграции базы данных: `python .\study\manage.py migrate`
 
 Запустите веб-приложение: `python .\study\manage.py runserver`
