@@ -19,7 +19,6 @@ menu = ["О сайте", "Добавить статью", "Обратная св
 
 
 def index(request):
-
     return render(request, 'index.html')
 
 
