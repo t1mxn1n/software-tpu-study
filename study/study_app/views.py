@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import FormView
 from django.shortcuts import get_object_or_404
+from django.forms.models import model_to_dict
 from django.contrib.auth.forms import UserCreationForm
 import datetime
 from datetime import timedelta
@@ -15,8 +16,6 @@ from django.contrib.auth.models import User
 from study_app.models import Category, Course, Lesson, LessonState, Feedback
 
 # Create your views here.
-menu = ["О сайте", "Добавить статью", "Обратная связь", "Войти"]
-
 
 def index(request):
     return render(request, 'index.html')
